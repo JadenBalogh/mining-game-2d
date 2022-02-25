@@ -5,7 +5,8 @@ using UnityEngine;
 public class RadiationSystem : MonoBehaviour
 {
     [SerializeField] private float moveInterval = 4f;
-    [SerializeField] private float moveIntervalDelta = 0.1f;
+    [SerializeField] private float moveIntervalCap = 0.2f;
+    [SerializeField] private float moveIntervalDecreasePercent = 0.25f;
     [SerializeField] private int damagePerTick = 1;
     [SerializeField] private int damageInterval = 1;
 
@@ -36,7 +37,8 @@ public class RadiationSystem : MonoBehaviour
         StartCoroutine(DamageLoop());
         while (true)
         {
-            moveInterval -= moveIntervalDelta;
+            moveInterval *= (1.0f - moveIntervalDecreasePercent);
+            moveInterval = Mathf.Max(moveInterval, moveIntervalCap);
             GameManager.TerrainSystem.RadiateRow(YPosition);
             YPosition--;
             yield return new WaitForSeconds(moveInterval);

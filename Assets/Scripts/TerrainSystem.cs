@@ -13,6 +13,7 @@ public class TerrainSystem : MonoBehaviour
     private int lastThreshold = 0;
     private int xOffset;
     private Biome currentBiome;
+    private int biomeDepthOffset = -1;
     private int currBiomeIndex = 0;
     public Block[,] Blocks { get; set; }
 
@@ -56,6 +57,12 @@ public class TerrainSystem : MonoBehaviour
         return arrPos.x >= 0 && arrPos.x < width && arrPos.y >= 0 && arrPos.y < 10000 && (Blocks[arrPos.x, arrPos.y] == null || Blocks[arrPos.x, arrPos.y].CanMine());
     }
 
+    public float GetMineDuration(Vector3Int gridPos)
+    {
+        Vector2Int arrPos = GridToArray(gridPos);
+        return Blocks[arrPos.x, arrPos.y].mineDuration;
+    }
+
     public void MineBlock(Vector3Int gridPos)
     {
         Vector2Int arrPos = GridToArray(gridPos);
@@ -70,21 +77,41 @@ public class TerrainSystem : MonoBehaviour
         for (int i = 0; i < width; i++)
         {
             Vector3Int tilePos = new Vector3Int(i - xOffset, yPos);
-            tilemap.RemoveTileFlags(tilePos, TileFlags.LockColor);
-            tilemap.SetColor(tilePos, radiationColor);
-            tilemap.SetTileFlags(tilePos, TileFlags.LockColor);
+            SetTileColor(tilePos, radiationColor);
         }
     }
+
+    // public void UpdateBiomes()
+    // {
+    //     if (currBiomeIndex > 0)
+    //     {
+    //         int prevArrIdx = currBiomeIndex - 1;
+    //         Biome prevBiome = biomes[prevArrIdx];
+    //         for (int i = 0; i < width; i++)
+    //         {
+    //             for (int j = 0; j < prevBiome.depth; j++)
+    //             {
+    //                 Vector3Int tilePos = new Vector3Int(i - xOffset, -j + biomeDepthOffset + prevBiome.depth);
+    //                 Blocks[i, j - (biomeDepthOffset + prevBiome.depth + 1)].OnUpdated(tilePos);
+    //             }
+    //         }
+    //     }
+
+    //     currentBiome = biomes[currBiomeIndex];
+    // }
 
     private void LoadBiome(int biomeIndex)
     {
         int arrIdx = Mathf.Min(biomeIndex, biomes.Length - 1);
+        if (biomeIndex > 0)
+        {
+            biomeDepthOffset -= currentBiome.depth;
+        }
         currentBiome = biomes[arrIdx];
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < currentBiome.depth; j++)
             {
-                int biomeDepthOffset = -currentBiome.depth * currBiomeIndex - 1;
                 Vector3Int tilePos = new Vector3Int(i - xOffset, -j + biomeDepthOffset);
                 List<Block> blockOptions = new List<Block>();
                 foreach (BlockData blockData in currentBiome.blockTypes)
@@ -97,9 +124,17 @@ public class TerrainSystem : MonoBehaviour
                 int randTileIdx = Random.Range(0, blockOptions.Count);
                 Block selectedBlock = blockOptions[randTileIdx];
                 tilemap.SetTile(tilePos, selectedBlock.tile);
-                Blocks[i, j + currentBiome.depth * currBiomeIndex] = selectedBlock;
+                Blocks[i, j - (biomeDepthOffset + 1)] = selectedBlock;
+                selectedBlock.OnSpawned(tilePos);
             }
         }
+    }
+
+    public void SetTileColor(Vector3Int tilePos, Color tileColor)
+    {
+        tilemap.RemoveTileFlags(tilePos, TileFlags.LockColor);
+        tilemap.SetColor(tilePos, tileColor);
+        tilemap.SetTileFlags(tilePos, TileFlags.LockColor);
     }
 
     [System.Serializable]

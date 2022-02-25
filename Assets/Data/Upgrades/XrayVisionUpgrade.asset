@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a314ac3cb92bbd4b918892c8e4f0cbf, type: 3}
-  m_Name: MiningCooldownUpgrade
+  m_Script: {fileID: 11500000, guid: 6a7cf76b947323147b00e9d822bbd584, type: 3}
+  m_Name: XrayVisionUpgrade
   m_EditorClassIdentifier: 
-  cooldownReduction: 0.1
+  maxStacks: 1

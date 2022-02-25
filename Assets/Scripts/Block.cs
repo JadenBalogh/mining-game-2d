@@ -11,4 +11,6 @@ public class Block : ScriptableObject
 
     public virtual bool CanMine() { return true; }
     public virtual void OnMined() { }
+    public virtual void OnSpawned(Vector3Int tilePos) { }
+    public virtual void OnUpdated(Vector3Int tilePos) { }
 }

@@ -9,6 +9,7 @@ public class UpgradeButton : MonoBehaviour
 
     [SerializeField] private Upgrade upgrade;
 
+    private int stacks = 0;
     private Button button;
 
     private void Awake()
@@ -19,11 +20,12 @@ public class UpgradeButton : MonoBehaviour
     public void ApplyUpgrade()
     {
         GameManager.UpgradeSystem.RemoveCurrency(cost);
+        stacks++;
         upgrade.Apply();
     }
 
     public void UpdateUsability(int currencyTotal)
     {
-        button.interactable = currencyTotal >= cost;
+        button.interactable = stacks < upgrade.MaxStacks && currencyTotal >= cost;
     }
 }

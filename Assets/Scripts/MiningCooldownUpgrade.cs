@@ -9,7 +9,6 @@ public class MiningCooldownUpgrade : Upgrade
 
     public override void Apply()
     {
-        Player player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
-        player.MineCooldown -= cooldownReduction;
+        GameManager.Player.MineCooldown -= cooldownReduction;
     }
 }
